@@ -13,6 +13,11 @@ const actions = {
             term,
         };
     },
+    *searchPlugins(term) {
+        const plugins = yield actions.fetch(term)
+
+        yield actions.setPlugins(plugins);
+    }
 }
 
 export const store = createReduxStore('plugins', {
@@ -39,13 +44,6 @@ export const store = createReduxStore('plugins', {
                 })
         },
     },
-    resolvers: {
-        * getPlugins(term) {
-            const plugins = yield actions.fetch(term)
-
-            return actions.setPlugins(plugins);
-        }
-    }
 });
 
 register(store);

@@ -14,42 +14,111 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./store */ "./src/store/index.js");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
 
 
 function App() {
   const [term, setTerm] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)('');
-  const [plugins, setPlugins] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
   const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const plugins = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => {
+    return select('plugins').getPlugins();
+  }, []);
+  const {
+    searchPlugins
+  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useDispatch)('plugins');
   const onSubmit = e => {
     e.preventDefault();
     setIsLoading(true);
-    fetch(`https://api.wordpress.org/plugins/info/1.2/?action=query_plugins&search=${term}`).then(response => response.json()).then(json => {
-      setIsLoading(false);
-      return setPlugins(json.plugins);
-    });
+    searchPlugins(term);
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("form", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("form", {
       onSubmit: onSubmit,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("input", {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("input", {
         value: term,
         onChange: e => setTerm(e.target.value)
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
         children: "Search"
       })]
-    }), isLoading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+    }), isLoading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
       children: "Loading..."
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("ul", {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("ul", {
       children: plugins.map(plugin => {
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
           children: plugin.name
         }, plugin.slug);
       })
     })]
   });
 }
+
+/***/ }),
+
+/***/ "./src/store/index.js":
+/*!****************************!*\
+  !*** ./src/store/index.js ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   store: () => (/* binding */ store)
+/* harmony export */ });
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_0__);
+
+const actions = {
+  setPlugins(plugins) {
+    return {
+      type: 'set_plugins',
+      plugins
+    };
+  },
+  fetch(term) {
+    return {
+      type: 'FETCH',
+      term
+    };
+  },
+  *searchPlugins(term) {
+    const plugins = yield actions.fetch(term);
+    yield actions.setPlugins(plugins);
+  }
+};
+const store = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.createReduxStore)('plugins', {
+  reducer(state = {
+    plugins: []
+  }, action) {
+    switch (action.type) {
+      case 'set_plugins':
+        return {
+          ...state,
+          plugins: action.plugins
+        };
+    }
+    return state;
+  },
+  actions,
+  selectors: {
+    getPlugins(state) {
+      return state.plugins;
+    }
+  },
+  controls: {
+    FETCH(action) {
+      return fetch(`https://api.wordpress.org/plugins/info/1.2/?action=query_plugins&search=${action.term}`).then(response => response.json()).then(json => {
+        return json.plugins;
+      });
+    }
+  }
+});
+(0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.register)(store);
 
 /***/ }),
 
@@ -60,6 +129,16 @@ function App() {
 /***/ ((module) => {
 
 module.exports = window["ReactJSXRuntime"];
+
+/***/ }),
+
+/***/ "@wordpress/data":
+/*!******************************!*\
+  !*** external ["wp","data"] ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["data"];
 
 /***/ }),
 
