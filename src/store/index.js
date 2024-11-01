@@ -1,10 +1,16 @@
 import {createReduxStore, register} from '@wordpress/data';
 
 const actions = {
+    setIsLoading(isLoading) {
+        return {
+            type: 'set_is_loading',
+            isLoading
+        }
+    },
     setPlugins(plugins) {
         return {
             type: 'set_plugins',
-            plugins
+            plugins,
         }
     },
     fetch(term) {
@@ -13,16 +19,22 @@ const actions = {
             term,
         };
     },
-    *searchPlugins(term) {
+    * searchPlugins(term) {
+        yield actions.setIsLoading(true)
+        yield actions.setPlugins([])
+
         const plugins = yield actions.fetch(term)
 
+        yield actions.setIsLoading(false)
         yield actions.setPlugins(plugins);
     }
 }
 
 export const store = createReduxStore('plugins', {
-    reducer(state = {plugins: []}, action) {
+    reducer(state = {plugins: [], isLoading: false}, action) {
         switch (action.type) {
+            case 'set_is_loading':
+                return {...state, isLoading: action.isLoading}
             case 'set_plugins':
                 return {...state, plugins: action.plugins}
         }
@@ -33,6 +45,9 @@ export const store = createReduxStore('plugins', {
     selectors: {
         getPlugins(state) {
             return state.plugins
+        },
+        getIsLoading(state) {
+            return state.isLoading
         }
     },
     controls: {

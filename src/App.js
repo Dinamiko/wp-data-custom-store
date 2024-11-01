@@ -4,17 +4,19 @@ import {useDispatch, useSelect} from "@wordpress/data";
 
 export function App() {
     const [term, setTerm] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
 
-    const plugins = useSelect( ( select ) => {
-        return select( 'plugins' ).getPlugins();
-    }, [] );
+    const isLoading = useSelect((select) => {
+        return select('plugins').getIsLoading()
+    }, []);
+
+    const plugins = useSelect((select) => {
+        return select('plugins').getPlugins();
+    }, []);
 
     const {searchPlugins} = useDispatch('plugins');
 
     const onSubmit = (e) => {
         e.preventDefault()
-        setIsLoading(true)
 
         searchPlugins(term)
     }

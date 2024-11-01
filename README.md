@@ -16,6 +16,6 @@ $ npm run start
 dispatch = wp.data.dispatch('plugins')
 select = wp.data.select('plugins')
 
-dispatch.searchPlugins('pdf')
+dispatch.searchPlugins('seo')
 select.getPlugins()
 ```

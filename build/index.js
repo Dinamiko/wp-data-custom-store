@@ -25,7 +25,9 @@ __webpack_require__.r(__webpack_exports__);
 
 function App() {
   const [term, setTerm] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)('');
-  const [isLoading, setIsLoading] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const isLoading = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => {
+    return select('plugins').getIsLoading();
+  }, []);
   const plugins = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => {
     return select('plugins').getPlugins();
   }, []);
@@ -34,7 +36,6 @@ function App() {
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useDispatch)('plugins');
   const onSubmit = e => {
     e.preventDefault();
-    setIsLoading(true);
     searchPlugins(term);
   };
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
@@ -74,6 +75,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_0__);
 
 const actions = {
+  setIsLoading(isLoading) {
+    return {
+      type: 'set_is_loading',
+      isLoading
+    };
+  },
   setPlugins(plugins) {
     return {
       type: 'set_plugins',
@@ -87,15 +94,24 @@ const actions = {
     };
   },
   *searchPlugins(term) {
+    yield actions.setIsLoading(true);
+    yield actions.setPlugins([]);
     const plugins = yield actions.fetch(term);
+    yield actions.setIsLoading(false);
     yield actions.setPlugins(plugins);
   }
 };
 const store = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.createReduxStore)('plugins', {
   reducer(state = {
-    plugins: []
+    plugins: [],
+    isLoading: false
   }, action) {
     switch (action.type) {
+      case 'set_is_loading':
+        return {
+          ...state,
+          isLoading: action.isLoading
+        };
       case 'set_plugins':
         return {
           ...state,
@@ -108,6 +124,9 @@ const store = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_0__.createReduxStore)(
   selectors: {
     getPlugins(state) {
       return state.plugins;
+    },
+    getIsLoading(state) {
+      return state.isLoading;
     }
   },
   controls: {
